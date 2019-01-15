@@ -1,26 +1,68 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
+import { Link } from 'react-router-dom';
+import Routing from './Routing';
 
 class App extends Component {
+  constructor() {
+    super();
+    this.state = {
+      username: "",
+      password: "",
+      isLoggedIn: false
+    }
+  }
+
+  componentDidMount() {
+    //1. cek apakah sudah ada session atau belum
+    if (localStorage.getItem("user_data")) {
+      this.setState({
+        username: JSON.parse(localStorage.getItem("user_data")).username,
+        password: JSON.parse(localStorage.getItem("user_data")).password,
+        isLoggedIn: true
+      });
+    }
+    else {
+      console.log("Silahkan login!");
+    }
+  }
+
+  login = () => {
+    //saat user login, simpan datanya ke local storage
+    let user_data = { username: this.state.username, password: this.state.password }
+    localStorage.setItem("user_data", JSON.stringify(user_data));
+    this.setState({ isLoggedIn: true });
+  }
+
+  logout = () => {
+    //saat user logout, delete local storage dan set state kosong
+    this.setState({ username: "", password: "", isLoggedIn: false });
+    localStorage.removeItem("user_data");
+  }
+
   render() {
+
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
+      <div style={{ margin: "20px" }}>
+
+        {/* cek, kalau sudah ke log in, tampilkan tombol logout; kalau belum, tombol login */}
+        {this.state.isLoggedIn ?
+          <Link to="/" type="button" onClick={this.logout} style={{ padding: "7px", backgroundColor: "gray", color: "white", textDecoration: "none", borderRadius: "50px", border: "none", display: "inline-block", marginTop: "10px" }}>Logout</Link>
+          :
+          <React.Fragment>
+            <label>Username: </label><input type="text" placeholder="Input username.." value={this.state.username} onChange={(e) => { this.setState({ username: e.target.value }) }} />
+            <br />
+            <label>Password: </label><input type="password" placeholder="Input password.." value={this.state.password} onChange={(e) => { this.setState({ password: e.target.value }) }} />
+            <br />
+            <Link to="/home" type="button" onClick={this.login} style={{ padding: "7px", backgroundColor: "gray", color: "white", textDecoration: "none", borderRadius: "50px", border: "none", display: "inline-block", marginTop: "10px" }}>Login</Link>
+          </React.Fragment>
+
+        }
+
+        {/* Ini hanya manggil component routing supaya ngeroute nya lebih rapi */}
+        <Routing username={this.state.isLoggedIn ? this.state.username : ""} />
+
+      </div >
     );
   }
 }
