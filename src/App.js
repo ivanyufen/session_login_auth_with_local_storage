@@ -36,8 +36,8 @@ class App extends Component {
 
   logout = () => {
     //saat user logout, delete local storage dan set state kosong
-    this.setState({ username: "", password: "", isLoggedIn: false });
     localStorage.removeItem("user_data");
+    this.setState({ username: "", password: "", isLoggedIn: false });
   }
 
   render() {
